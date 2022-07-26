@@ -20,7 +20,7 @@ library(lubridate)
 # Clean your workspace to reset your R environment
 
 rm( list = ls() )
-load( )
+load( "cleaningPRFA22.RData" )
 
 # Set working directory. This is the path to your Rstudio folder 
 # If you are in your correct Rstudio project then it should be:
@@ -238,9 +238,14 @@ head( datadf ); dim( datadf )
 
 datadf <- datadf %>% 
   group_by( serial ) %>% 
-  dplyr::filter( yr == "2021" & jday > StartDay | yr == "2022" & between(jday, 60, 182) ) %>% 
+  dplyr::filter( between(jday, 60, 182) ) %>%
   ungroup() 
 # why group and ungroup?
+
+datadf <- datadf %>% 
+  group_by( serial ) %>% 
+  dplyr::filter( StartYear == "2022" & jday > StartDay | StartYear == "2021" ) %>%
+  ungroup() 
 
 # view
 
@@ -269,6 +274,15 @@ range(SG$jday)
 unique(SG$StartYear)
 unique(SG$yr)
 unique(SG$mth)
+
+BigBaja <- datadf %>%
+  dplyr::filter(., territory == "BigBaja")
+head(BigBaja)
+range(BigBaja$jday)
+table(BigBaja$jday)
+unique(BigBaja$StartYear)
+unique(BigBaja$yr)
+unique(BigBaja$mth)
 
 # Create a new individual ID column:
 
