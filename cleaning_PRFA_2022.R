@@ -238,14 +238,14 @@ head( datadf ); dim( datadf )
 
 datadf <- datadf %>% 
   group_by( serial ) %>% 
-  dplyr::filter( between(jday, 60, 182) ) %>%
+  dplyr::filter( jday > 60 ) %>%
+  dplyr::filter( jday < 182 ) %>%
   ungroup() 
-# why group and ungroup?
 
 datadf <- datadf %>% 
   group_by( serial ) %>% 
-  dplyr::filter( StartYear == "2022" & jday > StartDay | StartYear == "2021" ) %>%
-  ungroup() 
+  dplyr::filter( date > StartDate ) %>%
+  ungroup()
 
 # view
 
