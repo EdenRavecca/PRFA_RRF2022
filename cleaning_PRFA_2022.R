@@ -88,10 +88,12 @@ NCA_Shape <- sf::st_read("Z:/Common/QCLData/Habitat/NCA/GIS_NCA_IDARNGpgsSamplin
 
 colnames( records )
 
-# keep transmitter id, date and sex
+# keep transmitter id, date, sex, x & y (nest location)
+# Note Owyhee and Big Baja x & y does not mark nest site, instead it marks capture location
+# Both of those individuals will likely not get used anyway
 
 records <- records %>% dplyr::select( Telemetry.Unit.ID, Sex, 
-                                      Date.and.Time)
+                                      Date.and.Time, y, x)
 # view
 
 records
@@ -222,7 +224,7 @@ datadf <- datadf %>%
 # Keep relevant information from the records dataframe 
 # Combine datadf to records df
 
-datadf <- records %>%  dplyr::select( serial, Sex, StartDate, StartDay ) %>% 
+datadf <- records %>%  dplyr::select( serial, Sex, StartDate, StartDay, y, x ) %>% 
   right_join( datadf, by = "serial" ) %>%
   mutate( StartYear = lubridate::year(StartDate) )
 
@@ -283,6 +285,15 @@ table(BigBaja$jday)
 unique(BigBaja$StartYear)
 unique(BigBaja$yr)
 unique(BigBaja$mth)
+
+HHGS_DS <- datadf %>%
+  dplyr::filter(., territory == "HHGS_DS")
+head(HHGS_DS)
+range(HHGS_DS$jday)
+table(HHGS_DS$jday)
+unique(HHGS_DS$StartYear)
+unique(HHGS_DS$yr)
+unique(HHGS_DS$mth)
 
 # Create a new individual ID column:
 
