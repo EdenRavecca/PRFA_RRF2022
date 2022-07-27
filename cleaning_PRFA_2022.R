@@ -97,6 +97,7 @@ records <- records %>% dplyr::select( Telemetry.Unit.ID, Sex,
 # view
 
 records
+records$capt_loc <- paste( records$y,",",records$x )
 
 # convert date to correct format using lubridate
 
@@ -224,7 +225,7 @@ datadf <- datadf %>%
 # Keep relevant information from the records dataframe 
 # Combine datadf to records df
 
-datadf <- records %>%  dplyr::select( serial, Sex, StartDate, StartDay, y, x ) %>% 
+datadf <- records %>%  dplyr::select( serial, Sex, StartDate, StartDay, capt_loc, y, x ) %>% 
   right_join( datadf, by = "serial" ) %>%
   mutate( StartYear = lubridate::year(StartDate) )
 
