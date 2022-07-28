@@ -15,7 +15,7 @@ rm( list = ls() )
 ###########################  SPATIAL REQUIREMENTS  #############################
 #........... Google API key for ggmap & function to plot google map   ..........
 
-register_google(key = "AIzaSyCjB86SwwyNFm1McSB0ZAvDBhvPgjA4_Xw")
+register_google(key = )
 # Define a function to fix the bbox to be in EPSG:3857
 
 ggmap_bbox <- function(map) {
@@ -69,7 +69,7 @@ st_crs(NCA_Shape) # UTM
 
 crsgoogle <- 3857 # EPSG 3857 (Pseudo-Mercator, what Google uses)
 
-#########################     PLOT ALL NEST SITES    ###########################
+#########################     Plot All Nest Sites    ###########################
 #................    Plot NCA and nest sites over base map    ..................
 
 NCA_google <- get_map( location = c(lon = -116.1267, lat = 43.05984), 
