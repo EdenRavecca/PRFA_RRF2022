@@ -97,11 +97,11 @@ nest_pts <- st_intersection(nest_buffer, data_sf_reproj) # create sf object of a
 
 # Plot NCA + nest buffers + points within each buffer
 ggplot() + 
-   geom_sf(data = NCA_Shape, size = 1.5, color = "black", fill = NA) +
-   geom_sf(data = nest_buffer, size = 1, color = "black", fill = "cyan1") +
-   stat_sf_coordinates(data = nest_pts) +
-   ggtitle("NCA") + 
-   coord_sf()
+  geom_sf(data = NCA_Shape, size = 1.5, color = "black", fill = NA) +
+  geom_sf(data = nest_buffer, size = 1, color = "black", fill = "cyan1") +
+  stat_sf_coordinates(data = nest_pts) +
+  ggtitle("NCA") + 
+  coord_sf()
 
 ######################     Buffer 1 Individual Nest    #########################
 #...........     Buffer and plot 1 nest for visual inspection    ...............
