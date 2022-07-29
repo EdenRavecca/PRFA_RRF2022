@@ -12,10 +12,10 @@ library(dplyr)
 
 rm( list = ls() )
 
-###########################  SPATIAL REQUIREMENTS  #############################
+#######################  SPATIAL-RELATED REQUIREMENTS  #########################
 #........... Google API key for ggmap & function to plot google map   ..........
 
-register_google(key = )
+register_google(key = "key_goes_here", write = TRUE)
 # Define a function to fix the bbox to be in EPSG:3857
 
 ggmap_bbox <- function(map) {
@@ -38,7 +38,7 @@ ggmap_bbox <- function(map) {
 ##############################  Load PRFA Data  ################################
 #.............. Data Extracted From 'datadf' in Cleaning Script   ..............
 
-load( "cleaningPRFA22.RData" )
+# load( "cleaningPRFA22.RData" )
 load( "nest_site_bufferpts.RData" )
 
 nest_site <- datadf %>%
@@ -106,6 +106,8 @@ ggplot() +
 ######################     Buffer 1 Individual Nest    #########################
 #...........     Buffer and plot 1 nest for visual inspection    ...............
 
+#........................     Small home range    ..............................
+
 CRW_site <- datadf %>%
   dplyr::group_by(territory) %>%
   dplyr::select(., y, x, territory) %>% # keep id and territory columns (and all rows)
@@ -119,6 +121,7 @@ CRW_sf_reproj <- st_transform(CRW_site_sf, crs = crstracks) # reproject from WGS
 
 CRW_buffer <- st_buffer(CRW_sf_reproj, 250) # buffer 250 m
 CRW_pts <- st_intersection(CRW_buffer, data_sf_reproj) # create sf object of all points within buffer
+# check about data_sf_reproj
 
 # Plot nest buffer + points within each buffer
 ggplot() + 
@@ -147,7 +150,139 @@ ggmap(CRW_google_x) +
   geom_sf(data = CRW_buff_reproj, size = 1, color = "black", fill = NA, inherit.aes = FALSE) +
   stat_sf_coordinates(data = CRW_pts_reproj, inherit.aes = FALSE)
 
+#........................     Large home range    ..............................
 
+CFR_site <- datadf %>%
+  dplyr::group_by(territory) %>%
+  dplyr::select(., y, x, territory) %>% # keep id and territory columns (and all rows)
+  dplyr::filter( territory == "CFR" )
+
+CFR_site <- CFR_site[!duplicated(CFR_site$y),] # remove duplicates (keeping only unique rows)
+
+CFR_site_sf <- st_as_sf(CFR_site, coords = c("x", "y"), crs = crsdata) # convert from data.frame to sf object
+
+CFR_sf_reproj <- st_transform(CFR_site_sf, crs = crstracks) # reproject from WGS 84 to UTM- for correctly measuring buffer
+
+CFR_buffer <- st_buffer(CFR_sf_reproj, 1000) # buffer # m
+CFR_pts <- st_intersection(CFR_buffer, data_sf_reproj) # create sf object of all points within buffer
+# check about data_sf_reproj
+st_bbox(CFR_buffer) # bounding box for buffer
+
+# Plot nest buffer + points within each buffer
+ggplot() + 
+  geom_sf(data = CFR_buffer, size = 1, color = "black", fill = "cyan1") +
+  stat_sf_coordinates(data = CFR_pts) +
+  ggtitle("CFR") + 
+  coord_sf(xlim = c(593339.5, 593839.5), ylim = c(4757257.4, 4757757.4), expand = FALSE) # buffer bbox as x & y limits
+
+CFR_buff_reproj <- st_transform(CFR_buffer, crs = crsgoogle) # Transform to EPSG 3857 (Pseudo-Mercator, what Google uses)
+CFR_pts_reproj <- st_transform(CFR_pts, crs = crsgoogle)
+st_crs(CFR_buff_reproj)
+st_crs(CFR_pts_reproj)
+st_crs(CFR_buff_reproj) == st_crs(CFR_pts_reproj)
+
+# Get google map using CRW nest location
+CFR_google <- get_map( location = c(lon = -115.8524, lat = 42.96446), 
+                       maptype = "terrain", source = "google", zoom = 14 )
+# Plot map
+ggmap(CFR_google)
+
+# Use function to assign correct google map CRS for plotting with geom_sf( )
+CFR_google_x <- ggmap_bbox(CFR_google)
+
+# Plot nest buffer over google map
+ggmap(CFR_google_x) + 
+  coord_sf(crs = crsgoogle) + # force the ggplot2 map to be in 3857
+  geom_sf(data = CFR_buff_reproj, size = 1, color = "black", fill = NA, inherit.aes = FALSE) +
+  stat_sf_coordinates(data = CFR_pts_reproj, inherit.aes = FALSE)
+
+###########     Buffer and assign points IN or OUT of territory    #############
+#..... Buffer 750m, keep pts outside of buffer, plot for visual inspection .....
+#.......       Repeat for all individuals in entire dataframe       ............
+
+# all CFR gps points: 
+CFR_pts_all <- datadf %>%
+  dplyr::filter( territory == "CFR" )
+
+CFR_pts_all_sf <- st_as_sf(CFR_pts_all, coords = c("lon", "lat"), crs = crsdata)
+CFR_all_reproj <- st_transform(CFR_pts_all_sf, crs = crstracks) # UTM
+head(CFR_all_reproj)
+
+CFR_nest <- datadf %>%
+  dplyr::group_by(territory) %>%
+  dplyr::select(., y, x, territory) %>% # keep id and territory columns (and all rows)
+  dplyr::filter( territory == "CFR" )
+
+CFR_nest <- CFR_nest[!duplicated(CFR_nest$y),] # remove duplicates (keeping only unique rows)
+CFR_nest_sf <- st_as_sf(CFR_nest, coords = c("x", "y"), crs = crsdata) # convert from data.frame to sf object
+CFR_nest_reproj <- st_transform(CFR_nest_sf, crs = crstracks) # reproject from WGS 84 to UTM- for correctly measuring buffer
+
+CFR750m <- st_buffer(CFR_nest_reproj, 750) # 750 m buffer around nest site
+# st_intersection(CFR_buffer, data_sf_reproj)
+CFR2km <- st_buffer(CFR_nest_reproj, 2000) # 2000 m buffer around nest site, for plotting
+
+# CFR_all_reproj$CFR_int_pts <- st_intersects(CFR_all_reproj, CFR750m)
+# head(CFR_all_reproj)
+# str(CFR_all_reproj)
+
+int_buff <- lengths(st_intersects(CFR_all_reproj, CFR750m)) > 0
+# NCA <- lengths(st_intersects(CFR_all_reproj, CFR750m)) < 1
+
+# This gives us TRUE/FALSE vectors telling us if the corresponding pts element is in each set of polygons. 
+# Logic then says:
+
+terr <- int_buff
+out <- !int_buff
+# str(terr)
+# str(out)
+
+# Now we can plot subsets of the points in different colours over the polygon geometry:
+  
+# visualize and check:
+
+st_bbox(CFR2km)
+
+ggplot() + 
+  geom_sf(data = CFR750m, size = 1, color = "black", fill = NA) +
+  stat_sf_coordinates(data = CFR_all_reproj[terr,], color = "blue") +
+  stat_sf_coordinates(data = CFR_all_reproj[out,], color = "red") +
+  coord_sf(xlim = c( 591589.5 , 595589.5 ), ylim = c( 4755507.4 , 4759507.4 ), expand = FALSE) +
+  ggtitle("CFR")
+
+# Keep all rows with points outside of territory
+
+CFR_pts_out <- CFR_all_reproj[out, ]
+head(CFR_pts_out)
+
+ggplot() + 
+  geom_sf(data = CFR750m, size = 1, color = "black", fill = NA) +
+  stat_sf_coordinates(data = CFR_pts_out, color = "blue") +
+  coord_sf(xlim = c( 591589.5 , 595589.5 ), ylim = c( 4755507.4 , 4759507.4 ), expand = FALSE) +
+  ggtitle("CFR")
+
+# plot with basemap
+
+# Get google map using CRW nest location
+CFR_google_z13 <- get_map( location = c(lon = -115.8524, lat = 42.96446), 
+                       maptype = "terrain", source = "google", zoom = 13 )
+# Plot map
+ggmap(CFR_google_z13)
+
+# Use function to assign correct google map CRS for plotting with geom_sf( )
+CFR_google_xz13 <- ggmap_bbox(CFR_google_z13)
+
+CFR_750_pm <- st_transform(CFR750m, crs = crsgoogle) # Transform to EPSG 3857 (Pseudo-Mercator, what Google uses)
+CFR_out_pm <- st_transform(CFR_pts_out, crs = crsgoogle)
+
+# Plot nest buffer over google map
+# note using google basemap with zoom=13 will remove all points outside of zoom extent
+# to view more points with larger extent, decrease zoom
+
+ggmap(CFR_google_xz13) + 
+  coord_sf(crs = crsgoogle) + # force the ggplot2 map to be in 3857
+  geom_sf(data = CFR_750_pm, size = 1, color = "black", fill = NA, inherit.aes = FALSE) +
+  stat_sf_coordinates(data = CFR_out_pm, color = "blue", inherit.aes = FALSE) +
+  ggtitle("CFR")
 
 save.image("nest_site_bufferpts.RData")
 
