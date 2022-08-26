@@ -79,10 +79,13 @@ min(SG_prep$alt)
 
 SG_prep$scaled_alt <- scale(SG_prep$alt)
 range(SG_prep$scaled_alt)
+
 plot(density(SG_prep$alt))
 hist(SG_prep$alt)
 
 ### Fit HMM
+
+# Examples for initial values:
 # initial step distribution natural scale parameters
 # stepPar0 <- c(1,5,0.5,3) # (mu_1,mu_2,sd_1,sd_2)
 # initial angle distribution natural scale parameters
@@ -98,12 +101,12 @@ fitAlt1PRFA <- fitHMM(data = SG_prep, nbStates = 2,
 
 
 
-
+# View range for altitude values in data including all individuals
 mean(data_breeders$alt)
 min(data_breeders$alt)
 range(data_breeders$alt)
 
-
+save.image("HMM_SG_Workspace.RData")
 
 
 
