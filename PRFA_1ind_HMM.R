@@ -104,7 +104,7 @@ stepPar0 <- c( 1, 5, 0.5, 3, 1, 1 ) # (mu_1,mu_2,sd_1,sd_2, zeromass_1, zeromass
 anglePar0 <- c(0, 0, 1, 8 ) # (mean_1,mean_2,concentration_1,concentration_2)
 
 #parameters for state distribution
-stepDM <- list( mean = ~1 , sd = ~1, zeromass = ~1 )
+stepDM <- list( mean = ~1, sd = ~1, zeromass = ~1 )
 angleDM <- list( mean = ~1, concentration = ~1 )
 #fit null model 
 fitAlt1PRFA <- fitHMM(data = SG_prep, 
@@ -126,6 +126,8 @@ fitAlt1PRFA <- fitHMM(data = SG_prep,
           #setting it to TRUE is same of settting circularAngleMean to 1
                     )
 
+#view results
+plot( fitAlt1PRFA )
 
 # View range for altitude values in data including all individuals
 mean(data_breeders$alt)
