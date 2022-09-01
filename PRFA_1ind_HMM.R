@@ -58,47 +58,73 @@ SG_FM_utm <- SG_FM_utm %>%
   dplyr::select(ID = "BurstID", date, t_, sex, alt, y, x)
 
 SG_FM_utm <- st_drop_geometry(SG_FM_utm) # remove geometry column
-class(SG_FM_utm)
-SG_df <- data.frame(SG_FM_utm)
-class(SG_df)
+head(SG_FM_utm)
 
+#create reduced dataframe that only includes columns of interest
+SG_df <- data.frame(SG_FM_utm) %>% 
+      select( ID, x, y, alt ) %>% 
+  mutate( scaled_alt = scale( alt ) )
+class(SG_df)
+#check for missing values in scaled predictor
+sum( is.na(SG_df$scaled_alt))
 ?prepData
 
-SG_prep <- prepData(SG_df, type = "UTM", coordNames = c("y","x"), covNames = "alt")
+#convert data to momentum format
+SG_prep <- prepData(SG_df, type = "UTM", coordNames = c("y","x"), 
+                    covNames = c("alt", "scaled_alt" ) )
 # some SL are 0 resulting in NA turning angle
+#check summary output
+summary(SG_prep) 
 
-sum(is.na(SG_prep$step)) # 164 NA step lengths
-sum(is.na(SG_prep$angle)) # 1283 NA turning angles
+#checks
 length(which(SG_prep$step == "0")) # 500 step lengths = 0
 as.integer(which(SG_prep$step == "0")) # which rows have step length 0
 class(SG_prep) # "momentuHMMData" "data.frame"  
 
-mean(SG_prep$alt)
-max(SG_prep$alt)
-min(SG_prep$alt)
+head( SG_prep )
 
-SG_prep$scaled_alt <- scale(SG_prep$alt)
 range(SG_prep$scaled_alt)
 
-plot(density(SG_prep$alt))
+plot(density(SG_prep$scaled_alt))
 hist(SG_prep$alt)
 
-### Fit HMM
+# we can now check teh autocorrelation of the step lengths
+acf( SG_prep$step[ !is.na( SG_prep$step) ], lag.max = 5000 )
+acf( SG_prep$step[ !is.na( SG_prep$step) ], lag.max = 100 )
+#lag for this animal is only about 3
 
-# Examples for initial values:
-# initial step distribution natural scale parameters
-# stepPar0 <- c(1,5,0.5,3) # (mu_1,mu_2,sd_1,sd_2)
+#visualize
+plot( SG_prep)
+############## Fit HMM ###############
+
+# initial step distribution natural scale parameters chosen from
+# Michelot et al. (2016)
+stepPar0 <- c( 1, 5, 0.5, 3, 1, 1 ) # (mu_1,mu_2,sd_1,sd_2, zeromass_1, zeromass_2 )
 # initial angle distribution natural scale parameters
-# anglePar0 <- c(0,0,1,8) # (mean_1,mean_2,concentration_1,concentration_2)
+anglePar0 <- c(0, 0, 1, 8 ) # (mean_1,mean_2,concentration_1,concentration_2)
 
-altPar0 <- c(0, 0.5, 0, 0.5) # mu_1, mu_2, sd_1, sd_2
-
-fitAlt1PRFA <- fitHMM(data = SG_prep, nbStates = 2,
-                    dist = list(scaled_alt = "gamma"),
-                    Par0 = list(scaled_alt = altPar0))
-
-
-
+#parameters for state distribution
+stepDM <- list( mean = ~1 , sd = ~1, zeromass = ~1 )
+angleDM <- list( mean = ~1, concentration = ~1 )
+#fit null model 
+fitAlt1PRFA <- fitHMM(data = SG_prep, 
+            #number of behavioral state to estimate
+            nbStates = 2,
+            #prob distributions of data streams
+            #aka for step length and turning angle
+            dist = list( step = "gamma", angle = "vm" ),
+           #starting values for distribution parameters for each data stream
+          Par0 = list(step = stepPar0, angle = anglePar0),
+          #design matrix formula for each parameter in state distribution
+          DM = list( step = stepDM, angle = angleDM  ),
+          # regression formula for transition probability covariates
+          formula = ~ 1,
+          #FALSE if we include time-varying covariates (e.g. alt)
+          stationary = FALSE,
+          #estimate angle mean for turning angle to use a circular angle mean
+          estAngleMean = list( angle = TRUE )
+          #setting it to TRUE is same of settting circularAngleMean to 1
+                    )
 
 
 # View range for altitude values in data including all individuals
