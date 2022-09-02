@@ -79,9 +79,10 @@ min(SG_prep$alt)
 
 SG_prep$scaled_alt <- scale(SG_prep$alt)
 range(SG_prep$scaled_alt)
+head(SG_prep)
 
 plot(density(SG_prep$alt))
-hist(SG_prep$alt)
+hist(SG_prep$alt, breaks = 100, xlim = c(500,1000))
 
 ### Fit HMM
 
@@ -105,6 +106,9 @@ fitAlt1PRFA <- fitHMM(data = SG_prep, nbStates = 2,
 mean(data_breeders$alt)
 min(data_breeders$alt)
 range(data_breeders$alt)
+
+plot(density(data_breeders$alt))
+hist(data_breeders$alt, breaks = 100, xlim = c(-500, 1000), ylim = c(0,1000))
 
 save.image("HMM_SG_Workspace.RData")
 
