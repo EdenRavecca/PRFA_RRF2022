@@ -243,7 +243,7 @@ angleDM_alt <- list( mean = ~1, concentration = ~1 + scaled_alt )
 
 m2_SG <- momentuHMM::fitHMM(data = SG_prep, nbStates = 2, dist = list( step = "gamma", angle = "vm" ),
                                   Par0 = list(step = stepPar0_alt, angle = anglePar0_alt),
-                                  DM = list( step = stepDM_alt, angle = stepDM_alt  ), formula = ~1,
+                                  DM = list( step = stepDM_alt, angle = angleDM_alt  ), formula = ~1,
                                   stationary = FALSE, estAngleMean = list( angle = TRUE ),
                                   stateNames = stateNames)
 
@@ -272,7 +272,7 @@ anglePar0_alt_full <- c(0.0023978079, 0.0001732104, -0.4206254134, 0, 2.72292274
 # m3_SG FULL MODEL formula 2 states
 # STEP ~ gamma( mu + scaled_alt, sd + scaled_alt, zerommass_int)
 # ANGLE ~ VonMises( mean_int, concentration + scaled_alt )
-stepDM_alt_full <- list( mean = ~1 + alt, sd = ~1 + alt, zeromass = ~1 )
+stepDM_alt_full <- list( mean = ~1 + scaled_alt, sd = ~1 + scaled_alt, zeromass = ~1 )
 angleDM_alt_full <- list( mean = ~1, concentration = ~1 + scaled_alt )
 
 m3_SG <- momentuHMM::fitHMM(data = SG_prep, nbStates = 2, dist = list( step = "gamma", angle = "vm" ),
