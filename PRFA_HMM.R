@@ -1,6 +1,6 @@
 
 
-###################### PRFA HMM ANALYSIS PREP SCRIPT ###########################
+###################### PRFA HMM ANALYSIS TEST SCRIPT ###########################
 #...............   Testing HMM ~alt with all individuals   .....................
 #...............          Using momentuHMM package         .....................
 
