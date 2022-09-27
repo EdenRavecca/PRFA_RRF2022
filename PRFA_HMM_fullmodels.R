@@ -158,7 +158,55 @@ plot(m5_PRFA, plotTracks = FALSE)
 print(m5_PRFA) # estimations
 plotPR(m5_PRFA)
 
+m6_PRFA <- momentuHMM::fitHMM(data = PRFA_habsc_prep, nbStates = 2, dist = list( step = "gamma", angle = "vm" ),
+                              Par0 = list(step = stepPar0_hab_full, angle = anglePar0_hab_full),
+                              DM = list( step = stepDM_hab_full, angle = angleDM_hab_full  ), 
+                              formula = ~1 + sage + nonsage + annherb + perenherb,
+                              stationary = FALSE, estAngleMean = list( angle = TRUE ),
+                              stateNames = stateNames)
+
+plot(m6_PRFA, plotTracks = FALSE)
+print(m6_PRFA) # estimations
+plotPR(m6_PRFA)
+
 save.image("PRFA_HMM_Habfull.RData")
+
+# FORAGING STATE (1) - step mean parameter.....................................#
+# x= sage, y= step mean; as sage increases, step mean decreases
+# x= nonsage, y= step mean; as nonsage increases, step mean decreases
+# x= annherb, y= step mean; as annherb increases, step mean increases
+# x= perenherb, y= step mean; as perenherb increases, step mean increases
+# FORAGING STATE (1) - step sd parameter.......................................#
+# x= sage, y= step sd; as sage increases, step sd decreases
+# x= nonsage, y= step sd; as nonsage increases, step sd increases
+# x= annherb, y= step sd; as annherb increases, step sd decreases
+# x= perenherb, y= step sd; as perenherb increases, step sd decreases
+
+# TRAVELING STATE (2) - step mean parameter....................................#
+# x= sage, y= step mean; as sage increases, step mean decreases
+# x= nonsage, y= step mean; as nonsage increases, step mean decreases
+# x= annherb, y= step mean; as annherb increases, step mean decreases
+# x= perenherb, y= step mean; as perenherb increases, step mean decreases
+# TRAVELING STATE (2) - step sd parameter......................................#
+# x= sage, y= step sd; as sage increases, step sd decreases
+# x= nonsage, y= step sd; as nonsage increases, step sd increases
+# x= annherb, y= step sd; as annherb increases, step sd increases
+# x= perenherb, y= step sd; as perenherb increases, step sd increases
+
+# FORAGING STATE (1) - angle concentration parameter...........................#
+# x= sage, y= angle concentration; as sage increases, angle concentration decreases
+# x= nonsage, y= angle concentration; as nonsage increases, angle concentration decreases
+# x= annherb, y= angle concentration; as annherb increases, angle concentration decreases
+# x= perenherb, y= angle concentration; as perenherb increases, angle concentration decreases
+
+# TRAVELING STATE (2) - angle concentration parameter..........................#
+# x= sage, y= angle concentration; as sage increases, angle concentration increases
+# x= nonsage, y= angle concentration; as nonsage increases, angle concentration decreases
+# x= annherb, y= angle concentration; as annherb increases, angle concentration decreases
+# x= perenherb, y= angle concentration; as perenherb increases, angle concentration decreases
+
+
+
 
 
 
