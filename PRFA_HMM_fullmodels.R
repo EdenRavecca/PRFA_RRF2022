@@ -158,6 +158,60 @@ plot(m5_PRFA, plotTracks = FALSE)
 print(m5_PRFA) # estimations
 plotPR(m5_PRFA)
 
+#forage mean = 35
+#non sage
+plot( density( rgamma( n = 100, shape = 26, scale = 27)))
+plot( density( rgamma( n = 100, shape = 36, scale = 30)))
+#annual
+plot( density( rgamma( n = 100, shape = 34, scale = 25)))
+plot( density( rgamma( n = 100, shape = 37, scale = 28)))
+#sage
+plot( density( rgamma( n = 100, shape = 34, scale = 24)))
+plot( density( rgamma( n = 100, shape = 35.5, scale = 28)))
+
+#travel mean = 67.9
+#sage
+plot( density( rgamma( n = 100, shape = 67.4, scale = 22.5)))
+plot( density( rgamma( n = 100, shape = 68, scale = 24.5)))
+
+#non sage
+plot( density( rgamma( n = 100, shape = 62, scale = 23.8)))
+plot( density( rgamma( n = 100, shape = 69, scale = 24.4)))
+
+#perenial
+plot( density( rgamma( n = 100, shape = 66.5, scale = 23)))
+plot( density( rgamma( n = 100, shape = 68.5, scale = 25.5)))
+
+#annual
+plot( density( rgamma( n = 100, shape = 64, scale = 23)))
+plot( density( rgamma( n = 100, shape = 70, scale = 27)))
+
+
+#von misses foraging
+#mean = 0.022
+#sagebrush
+plot( density( CircStats::rvm( n = 100, mean = 0.022,k = 0.51)))
+plot( density( CircStats::rvm( n = 100, mean = 0.022,k = 0.54)))
+
+#nonsagebrush
+plot( density( CircStats::rvm( n = 100, mean = 0.022,k = 0.2)))
+plot( density( CircStats::rvm( n = 100, mean = 0.022,k = 0.6)))
+
+#annual
+plot( density( CircStats::rvm( n = 100, mean = 0.022,k = 0.35)))
+plot( density( CircStats::rvm( n = 100, mean = 0.022,k = 0.60)))
+
+#travel
+#mean = 9.15E-5
+#sagebrush
+plot( density( CircStats::rvm( n = 100, mean = 9.15E-5,k = 16)))
+plot( density( CircStats::rvm( n = 100, mean = 9.15E-5,k = 28)))
+
+#perennial
+plot( density( CircStats::rvm( n = 100, mean = 9.15E-5,k = 14)))
+plot( density( CircStats::rvm( n = 100, mean = 9.15E-5,k = 19)))
+
+
 save.image("PRFA_HMM_Habfull.RData")
 
 
