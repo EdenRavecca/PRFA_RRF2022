@@ -169,6 +169,9 @@ plot(m6_PRFA, plotTracks = FALSE)
 print(m6_PRFA) # estimations
 plotPR(m6_PRFA)
 
+par(ask= FALSE)
+plot(density( CircStats::rvm( n = 100, mean = 1.680747e+01, k = 0.08209443 )))
+
 save.image("PRFA_HMM_Habfull.RData")
 
 
