@@ -172,6 +172,29 @@ plotPR(m6_PRFA)
 par(ask= FALSE)
 plot(density( CircStats::rvm( n = 100, mean = 1.680747e+01, k = 0.08209443 )))
 
+
+stepPar0_hab_full7 <- c( 3.558848, 4.218419, 3.309423, 3.174193, -5.074119, -28.568315)
+anglePar0_hab_full7 <- c(9.254339e-03, 4.627725e-05, -6.153377e-01, 2.834985e+00)
+
+stepDM_hab_full7 <- list( mean = ~1, sd = ~1, zeromass = ~1 )
+
+angleDM_hab_full7 <- list( mean = ~1, concentration = ~1 )
+
+m7_PRFA <- momentuHMM::fitHMM(data = PRFA_habsc_prep, nbStates = 2, dist = list( step = "gamma", angle = "vm" ),
+                              Par0 = list(step = stepPar0_hab_full7, angle = anglePar0_hab_full7),
+                              DM = list( step = stepDM_hab_full7, angle = angleDM_hab_full7 ), 
+                              formula = ~1 + sage + nonsage + annherb + perenherb,
+                              stationary = FALSE, estAngleMean = list( angle = TRUE ),
+                              stateNames = stateNames)
+
+plot(m7_PRFA, plotTracks = FALSE)
+print(m7_PRFA) # estimations
+plotPR(m7_PRFA)
+
+AIC(m5_PRFA, m6_PRFA, m7_PRFA)
+
+plotStationary( m7_PRFA, plotCI = TRUE )
+
 save.image("PRFA_HMM_Habfull.RData")
 
 
